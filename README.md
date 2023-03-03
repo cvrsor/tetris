@@ -173,7 +173,7 @@ The spec folder structure follows the app's folder structure. Each `*.rb` file h
 
   
 
-You can run the tests using `rake spec` command, which outputs:
+You can run the tests using `rspec spec/` command, which outputs:
 
   
 

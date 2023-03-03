@@ -58,7 +58,7 @@ if ARGF.file == STDIN
     if STDIN.tty?
         puts "Error: No input provided.".colorize(:red)
         puts "Please pass an input file using STDIN, for example:"
-        puts "./tetris.rb < input.txt".colorize(:color => :green, :mode => :bold) + " or " + "cat input.txt | ./tetris.rb".colorize(:color => :green, :mode => :bold)
+        puts "./bin/tetris.rb < data/input.txt".colorize(:color => :green, :mode => :bold) + " or " + "cat input.txt | ./tetris.rb".colorize(:color => :green, :mode => :bold)
         exit
     end
 end
