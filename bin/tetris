@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+require "bundler/setup"
+require "colorize"
+require 'optparse'
+
+require_relative '../lib/tetris_game.rb'
+include PrettyOutput
+
+options = {
+    show_debug_info: false,
+    visualize_grid: nil,
+    clear_lines: true
+}
+
+#OUTPUT
+# Check if output is being printed to the terminal or redirected to a file
+# if redirected to a file, ignore any command line options
+def output_to_terminal?
+    STDOUT.tty?
+end
+OptionParser.new do |opts|
+    opts.banner = "Usage: ./bin/tetris [options] < data/input.txt"
+
+    opts.on("-d", "--debug", "Displays debug information") do |v|
+        next unless output_to_terminal?
+        options[:show_debug_info] = true 
+        puts "Verbose mode is on"
+    end
+
+    opts.on("-v", "--visualize-grid", "Shows a visual representation of the grid after all pieces have been placed") do |v|
+        next unless output_to_terminal?
+        options[:visualize_grid] = true
+    end
+
+    opts.on("-s", "--display-shapes", "Displays all the different shapes that can be used in the tetris game") do |v|
+        next unless output_to_terminal?
+        pretty_print_all_shapes()
+        exit
+    end
+
+    opts.on("-cl", "--do-not-clear-lines", "Disables the default behavior of clearing filled lines on the tetris board") do |v|
+        #useful when debugging
+        next unless output_to_terminal?
+        options[:clear_lines] = false
+    end
+
+    opts.on("-h", "--help", "Displays the available options and their descriptions for the command line application") do |v|
+        next unless output_to_terminal?
+        puts opts
+        exit
+    end
+end.parse!
+
+#INPUT
+# Check if input is coming from STDIN
+if ARGF.file == STDIN
+    # Check if there hasn't been any input
+    if STDIN.tty?
+        puts "Error: No input provided.".colorize(:red)
+        puts "Please pass an input file using STDIN, for example:"
+        puts "./tetris.rb < input.txt".colorize(:color => :green, :mode => :bold) + " or " + "cat input.txt | ./tetris.rb".colorize(:color => :green, :mode => :bold)
+        exit
+    end
+end
+
+#Read each line from STDIN
+sequences = []
+ARGF.each_line do |line|
+    sequences << line.strip #remove whitespace/line breaks
+end
+
+sequence_heights = []
+
+#sequences = [sequences[1]]
+sequences.each { |sequence|
+    #create a new instance of a tetris game
+    current_game = TetrisGame.new(sequence, options)
+    height = current_game.find_blocks_height()
+    sequence_heights.push(height)
+    current_game = nil
+}
+
+# Output the results
+# each line has the maximum height of the corresponding line in the input file.
+sequence_heights.map{|height| puts height }
